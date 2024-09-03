@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0" />
+    <meta charset="utf-8" />
+    <title> 隨機分組工具 </title>
+    <style>
+        .btn {
+            background-color: #ffcccc;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .title {
+            margin: 10px;
+            text-align: center;
+            font-size: 1cm;
+        }
+
+        .notClickCss {
+            pointer-events: none;
+            cursor: not-allowed;
+            background-color: #FFF0F5;
+            margin-top: 10px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            width: 30%;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 1100px) {
+            .box {
+                width: 50%;
+                margin: 5px 0;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .box {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        #imgLove {
+            display: none;
+            max-width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .img-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .textareaInput {
+            width: 100%;
+            max-width: 600px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        .textareaCss {
+            resize: none;
+            max-width: 600px;
+        }
+
+        .smallTitle {
+            margin-bottom: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">
+        隨機分組
+    </div>
+    <div style="text-align:center;">
+        <textarea name="" id="text" cols="80" rows="10" class="textareaInput" placeholder="✨請輸入名稱✨
+✨一行一個名字✨
+小雞
+小毛
+小奇
+小青蛙
+小熊貓">
+小雞
+小毛
+小奇
+小青蛙
+小熊貓
+</textarea>
+    </div>
+    <div style="text-align:center;">
+        <div>
+            <span>目前共輸入</span><span id="displayNameAmount">5</span><span>個名字</span>
+        </div>
+        <div style="padding:10px;">
+            分組數量：<input id="amount" type="number" value="2" step="1" min="2" required>
+        </div>
+        <div style="padding:10px">
+            <span onclick="random()" class="btn" id="randomId">隨機分組</span>
+            <span onclick="empty()" class="btn" id="emptyId">清空</span>
+        </div>
+    </div>
+    <hr>
+    <div class="title">
+        分組結果
+    </div>
+    <p></p>
+    <div class="container">
+        <span class="box">
+            <span class="smallTitle">一組一段落呈現</span>
+            <textarea name="" id="result" cols="40%" rows="10" class="textareaCss"></textarea>
+            <span onclick="clone()" class="notClickCss" id="copy">複製結果</span>
+        </span>
+        <span class="box">
+            <span class="smallTitle">一名字一行呈現</span>
+            <textarea name="" id="result2" cols="40%" rows="10" class="textareaCss"></textarea>
+            <span onclick="clone2()" class="notClickCss" id="copy2">複製結果</span>
+        </span>
+        <span class="box">
+            <span class="smallTitle">我對你的愛的呈現</span>
+            <div class="img-container">
+                <img id="imgLove">
+            </div>
+            <textarea name="" id="result3" cols="40%" rows="10" class="textareaCss" placeholder="期待一下八w
+期待一下8w
+期待一下baw
+期待一下バw
+期待一下바w
+期待一下吧w"></textarea>
+            <span class="notClickCss" id="copy3">複製結果</span>
+        </span>
+    </div>
+
+    <script>
+        function TextAndAmount(event) {
+            let inputAmount = document.querySelector("#amount").value;
+            let splitTexts = document.querySelector("#text").value.split(/\r|\r\n|\n/)
+            for (i = 0; i < splitTexts.length; i++) {
+                if (splitTexts[i] == '' || splitTexts.indexOf(splitTexts[i]) != i) {
+                    splitTexts.splice(i, 1);
+                    i--;
+                }
+            }
+            let rows = splitTexts.length
+            document.querySelector("#displayNameAmount").innerHTML = rows;
+            let randomBtn = document.querySelector("#randomId");
+            if (rows >= 2 && rows >= inputAmount && inputAmount >= 2) {
+                randomBtn.classList.remove("notClickCss");
+                randomBtn.classList.add("btn");
+            } else {
+                randomBtn.classList.remove("btn");
+                randomBtn.classList.add("notClickCss");
+            }
+        }
+        document.getElementById("text").addEventListener("input", TextAndAmount);
+        document.getElementById("amount").addEventListener("input", TextAndAmount);
+
+        function random() {
+            let inputAmount = document.querySelector("#amount").value;
+            let splitTexts = document.querySelector("#text").value.split(/\r|\r\n|\n/)
+            for (i = 0; i < splitTexts.length; i++) {
+                if (splitTexts[i] == '' || splitTexts.indexOf(splitTexts[i]) != i) {
+                    splitTexts.splice(i, 1);
+                    i--;
+                }
+            }
+            let rows = splitTexts.length
+            let groupAmount = Math.floor(splitTexts.length / inputAmount)
+            let shuffleArray = arr => arr.sort(() => 0.5 - Math.random());
+            let final = shuffleArray(splitTexts);
+            let finalArr = []
+            function greet() {
+                for (i = 0; i < inputAmount; i++) {
+                    let breakCount = 0;
+                    for (j = 0; j < groupAmount; j++) {
+                        if (breakCount >= groupAmount) {
+                            break;
+                        }
+                        let temp = "第" + (i + 1) + "組：";
+                        let temp2 = final[j];
+                        finalArr.push(temp);
+                        finalArr.push(temp2 + "、");
+                        breakCount += 1;
+                        final.splice(j, 1);
+                        j--;
+                    }
+                }
+                return finalArr;
+            }
+            greet();
+            let tpp = 0;
+            finalArr = [...new Set(finalArr)]
+            if (final != []) {
+                for (j = 0; j < finalArr.length; j++) {
+                    let regex = /第\d+組：/;
+                    if (regex.test(finalArr[j]) && tpp <= final.length - 1) {
+                        finalArr.splice(j + 1, 0, final[tpp] + "、")
+                        tpp++;
+                    }
+                }
+            }
+            let temps = finalArr.join('');
+            let indexArr = []
+            let q = 2;
+            while (q < temps.length) {
+                let indexfinal = temps.indexOf("第", q);
+                if (indexfinal != -1 && indexArr.includes(indexfinal) == false) {
+                    function insertStr(soure, start, newStr) {
+                        return temps.slice(0, indexfinal) + "\n" + temps.slice(indexfinal);
+                    }
+                    temps = insertStr(temps, indexfinal, "\n");
+                    indexArr.push(indexfinal + 1);
+                }
+                if (indexArr.length == inputAmount - 1) {
+                    break;
+                }
+                q = indexfinal + 2;
+            }
+            temps = temps.replace(/、\n/g, '\n\n');
+            temps = temps.replace(/、$/gm, '');
+            document.getElementById('result').value = temps;
+            handleInputEventCopy();
+            for (let i = 0; i < temps.length; i++) {
+                if (temps[i] == "、") {
+                    temps = temps.replace(temps[i], "\n");
+                } else if (temps[i] == "：") {
+                    function insertStr(str, index, newStr) {
+                        return str.slice(0, index + 1) + newStr + str.slice(index + 1)
+                    }
+                    temps = insertStr(temps, i, "\n")
+                }
+            }
+            document.getElementById('result2').value = temps;
+            handleInputEventCopy();
+
+            let catText = document.querySelector("#copy3")
+            let imgCat = document.querySelector("#imgLove")
+            if (catText.innerHTML == "複製結果") {
+                document.querySelector("#result3").remove();
+                imgCat.style.display = "block";
+                catText.innerHTML = "✨因為貓貓可愛所以分享給你(❁´◡`❁)✨"
+                catText.style.background = "#FFFF00"
+            }
+            function changeImg() {
+                imgCat.src = "p7-cat" + Math.ceil(Math.random() * 6) + ".jpg";
+            };
+            changeImg();
+        }
+
+        function empty() {
+            let all = document.querySelector("#text");
+            let notClick1 = document.querySelector("#randomId")
+            if (confirm(("確定要清空?!...?!")) == true) {
+                all.value = "";
+                handleInputEventCopy();
+                TextAndAmount();
+            }
+        }
+
+        function handleInputEventCopy(event) {
+            let all = document.querySelector("#result");
+            let notClick3 = document.querySelector("#copy")
+            if (all.value == "") {
+                notClick3.classList.remove("btn");
+                notClick3.classList.add("notClickCss");
+            } else {
+                notClick3.classList.remove("notClickCss");
+                notClick3.classList.add("btn");
+            }
+            let allCopy2 = document.querySelector("#result2");
+            let notClickCopy2 = document.querySelector("#copy2")
+            if (allCopy2.value == "") {
+                notClickCopy2.classList.remove("btn");
+                notClickCopy2.classList.add("notClickCss");
+            } else {
+                notClickCopy2.classList.remove("notClickCss");
+                notClickCopy2.classList.add("btn");
+            }
+            let allText = document.querySelector("#text");
+            let notClickText = document.querySelector("#emptyId")
+            if (allText.value == "") {
+                notClickText.classList.remove("btn");
+                notClickText.classList.add("notClickCss");
+            } else {
+                notClickText.classList.remove("notClickCss");
+                notClickText.classList.add("btn");
+            }
+        }
+        document.querySelector("#result").addEventListener("input", handleInputEventCopy);
+        document.querySelector("#result2").addEventListener("input", handleInputEventCopy);
+        document.querySelector("#text").addEventListener("input", handleInputEventCopy);
+
+        function clone() {
+            let btnCopy = document.querySelector("#result")
+            btnCopy.select();
+            document.execCommand('copy');
+            alert("複製成功");
+        }
+
+        function clone2() {
+            let btnCopy = document.querySelector("#result2")
+            btnCopy.select();
+            document.execCommand('copy');
+            alert("複製成功");
+        }
+
+    </script>
+
+</body>
+
+</html>

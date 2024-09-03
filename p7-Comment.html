@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0" />
+    <meta charset="utf-8" />
+    <title> 隨機分組 </title>
+    <style>
+        .btn {
+            background-color: #ffcccc;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .title {
+            margin: 10px;
+            text-align: center;
+            font-size: 1cm;
+        }
+
+        .notClickCss {
+            pointer-events: none;
+            cursor: not-allowed;
+            background-color: #FFF0F5;
+            margin-top: 10px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            width: 30%;
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 1100px) {
+            .box {
+                width: 50%;
+                margin: 5px 0;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .box {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        #imgLove {
+            display: none;
+            max-width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .img-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .textareaInput {
+            width: 100%;
+            max-width: 600px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        .textareaCss {
+            resize: none;
+            max-width: 600px;
+        }
+
+        .smallTitle {
+            margin-bottom: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">
+        隨機分組
+    </div>
+    <div style="text-align:center;">
+        <textarea name="" id="text" cols="80" rows="10" class="textareaInput" placeholder="✨請輸入名稱✨
+✨一行一個名字✨
+小雞
+小毛
+小奇
+小青蛙
+小熊貓">
+小雞
+小毛
+小奇
+小青蛙
+小熊貓
+</textarea>
+    </div>
+    <div style="text-align:center;">
+        <div>
+            <span>目前共輸入</span><span id="displayNameAmount">5</span><span>個名字</span>
+        </div>
+        <div style="padding:10px;">
+            分組數量：<input id="amount" type="number" value="2" step="1" min="2" required>
+        </div>
+        <div style="padding:10px">
+            <span onclick="random()" class="btn" id="randomId">隨機分組</span>
+            <span onclick="empty()" class="btn" id="emptyId">清空</span>
+        </div>
+    </div>
+    <hr>
+    <div class="title">
+        分組結果
+    </div>
+    <p></p>
+    <div class="container">
+        <span class="box">
+            <span class="smallTitle">一組一段落呈現</span>
+            <textarea name="" id="result" cols="40%" rows="10" class="textareaCss"></textarea>
+            <span onclick="clone()" class="notClickCss" id="copy">複製結果</span>
+        </span>
+        <span class="box">
+            <span class="smallTitle">一名字一行呈現</span>
+            <textarea name="" id="result2" cols="40%" rows="10" class="textareaCss"></textarea>
+            <span onclick="clone2()" class="notClickCss" id="copy2">複製結果</span>
+        </span>
+        <span class="box">
+            <span class="smallTitle">我對你的愛的呈現</span>
+            <div class="img-container">
+                <img id="imgLove">
+            </div>
+            <textarea name="" id="result3" cols="40%" rows="10" class="textareaCss" placeholder="期待一下八w
+期待一下8w
+期待一下baw
+期待一下バw
+期待一下바w
+期待一下吧w"></textarea>
+            <span class="notClickCss" id="copy3">複製結果</span>
+        </span>
+    </div>
+
+    <script>
+        // 分組數量如果大於名字數量 則不可按下隨機分組按鈕
+        function TextAndAmount(event) {
+            // 分組數量
+            let inputAmount = document.querySelector("#amount").value;
+            // 以換行為分隔 拆分成陣列
+            let splitTexts = document.querySelector("#text").value.split(/\r|\r\n|\n/)
+            for (i = 0; i < splitTexts.length; i++) {
+                // 去掉空值 || 去掉重複值
+                if (splitTexts[i] == '' || splitTexts.indexOf(splitTexts[i]) != i) {
+                    splitTexts.splice(i, 1);
+                    // 去掉之後陣列長度會改變 i需-1 以確保每個位置都有進入迴圈
+                    i--;
+                }
+            }
+            // 名字數量
+            let rows = splitTexts.length
+            //　顯示在畫面上 目前已有rows個名字
+            document.querySelector("#displayNameAmount").innerHTML = rows;
+            let randomBtn = document.querySelector("#randomId");
+            // 名字數量>=2 && 名字數量=>分組數量 && 分組數量>=2，若為是 則變更"隨機分組"按鈕的樣式為btn
+            if (rows >= 2 && rows >= inputAmount && inputAmount >= 2) {
+                randomBtn.classList.remove("notClickCss");
+                randomBtn.classList.add("btn");
+            } else {
+                // 若為非 則變更"隨機分組"按鈕的樣式為notClickCss
+                randomBtn.classList.remove("btn");
+                randomBtn.classList.add("notClickCss");
+            }
+        }
+        document.getElementById("text").addEventListener("input", TextAndAmount);
+        document.getElementById("amount").addEventListener("input", TextAndAmount);
+
+        // 隨機分組按鈕
+        function random() {
+            let inputAmount = document.querySelector("#amount").value;
+            // 把名字以換行為分隔 拆分成陣列
+            let splitTexts = document.querySelector("#text").value.split(/\r|\r\n|\n/)
+            for (i = 0; i < splitTexts.length; i++) {
+                // 去掉空值 || 去掉重複值
+                if (splitTexts[i] == '' || splitTexts.indexOf(splitTexts[i]) != i) {
+                    splitTexts.splice(i, 1);
+                    // 去掉之後陣列長度會改變 i需-1 以確保每個位置都有進入迴圈
+                    i--;
+                }
+            }
+            // 名字數量
+            let rows = splitTexts.length
+            // 每組的名字數量：名字數量/分組數量
+            let groupAmount = Math.floor(splitTexts.length / inputAmount)
+            // 隨機打亂陣列順序的函數
+            let shuffleArray = arr => arr.sort(() => 0.5 - Math.random());
+            // 把名字放入shuffleArray函數 取得打亂順序的名字陣列
+            let final = shuffleArray(splitTexts);
+            // 設一個空陣列 拿來儲存greet函數跑完的結果
+            let finalArr = []
+            // 從打亂的陣列把名字拿出 依序放入組別
+            function greet() {
+                for (i = 0; i < inputAmount; i++) {
+                    let breakCount = 0;
+                    for (j = 0; j < groupAmount; j++) {
+                        // 名字放入數量 >= 每組的名字數量 則中斷內層迴圈 繼續下一個迴圈
+                        if (breakCount >= groupAmount) {
+                            break;
+                        }
+                        // 把【第X組：】和【final[j]】和【、】放入陣列 ✨🤯合併問題
+                        let temp = "第" + (i + 1) + "組：";
+                        let temp2 = final[j];
+                        finalArr.push(temp);
+                        finalArr.push(temp2 + "、");
+                        // 計算每組已放入的名字數量
+                        breakCount += 1;
+                        // 把已加入組別的名字刪除 否則當i=2 進入內層迴圈又從j=0開始跑 會把已經被分配組別的名字會再次被分配
+                        final.splice(j, 1);
+                        // 因為刪掉了 所以-1 確保按照陣列順序分配
+                        j--;
+                    }
+                }
+                return finalArr;
+            }
+            greet();
+            // 組別數量*每組成員數量!=名字數量 final就不會被放完 
+            // 每組數量=2 每組只能放入2個 分兩組 但成員數量有5個 會有一個被剩下 final裡就是被剩下的值
+            // 在【第X組：】後插入final的值 所以要先去重 不然重複的【第X組】後面才去重的話 組別名會消失 被分配到不對的組別結果
+            let tpp = 0;
+            finalArr = [...new Set(finalArr)]
+            if (final != []) {
+                for (j = 0; j < finalArr.length; j++) {
+                    let regex = /第\d+組：/;
+                    // 如果在finalArr的第j個位置有找到regex的值 而且tpp小於等於final的長度-1
+                    if (regex.test(finalArr[j]) && tpp <= final.length - 1) {
+                        // 在finalArr的第j+1個位置插入final的值
+                        finalArr.splice(j + 1, 0, final[tpp] + "、")
+                        tpp++;
+                    }
+                }
+            }
+            let temps = finalArr.join('');
+            let indexArr = []
+            // 跳過第一個"第"
+            let q = 2;
+            while (q < temps.length) {
+                // indexfinal = "第"的位置
+                let indexfinal = temps.indexOf("第", q);
+                // 如果"第"有被找到 而且 "第"的位置是第一次被找到
+                if (indexfinal != -1 && indexArr.includes(indexfinal) == false) {
+                    function insertStr(soure, start, newStr) {
+                        return temps.slice(0, indexfinal) + "\n" + temps.slice(indexfinal);
+                    }
+                    // 呼叫insertStr函數 把temps 從indexfinal這個位置切開 插入換行 再補回來切開後indexfinal後面剩下的
+                    temps = insertStr(temps, indexfinal, "\n");
+                    // 更新找到的"第"的位置 在插入換行之後 "第"的位置為原找到的位置+1
+                    indexArr.push(indexfinal + 1);
+                }
+                // 如果被找到"第"的位置的陣列長度 等於 分組數量-1 
+                // 因為跳過第一個"第" 所以只會找到(分組數量-1)個"第" 結束迴圈
+                if (indexArr.length == inputAmount - 1) {
+                    break;
+                }
+                // 下一個迴圈的q 直接從 "第"的位置+1再+1(因為換行 長度會增加)
+                q = indexfinal + 2;
+            }
+            // 把每組最後一個頓號刪掉 改成換行
+            temps = temps.replace(/、\n/g, '\n\n');
+            // 刪除整個字串行末的頓號
+            temps = temps.replace(/、$/gm, '');
+            document.getElementById('result').value = temps;
+            handleInputEventCopy();
+            // 一名字一行呈現
+            for (let i = 0; i < temps.length; i++) {
+                // 如果temps[i]是頓號 則把頓號替換成換行
+                if (temps[i] == "、") {
+                    temps = temps.replace(temps[i], "\n");
+                    // 如果temps[i]是冒號 則插入換行
+                } else if (temps[i] == "：") {
+                    function insertStr(str, index, newStr) {
+                        return str.slice(0, index + 1) + newStr + str.slice(index + 1)
+                    }
+                    temps = insertStr(temps, i, "\n")
+                }
+            }
+            document.getElementById('result2').value = temps;
+            handleInputEventCopy();
+
+            let catText = document.querySelector("#copy3")
+            let imgCat = document.querySelector("#imgLove")
+            if (catText.innerHTML == "複製結果") {
+                // 移除textarea標籤
+                document.querySelector("#result3").remove();
+                // 把imgLove的改為顯示
+                imgCat.style.display = "block";
+                // 把第三個"複製結果"的按鈕 改文字內容 改背景顏色
+                catText.innerHTML = "✨因為貓貓可愛所以分享給你(❁´◡`❁)✨"
+                catText.style.background = "#FFFF00"
+            }
+            // 在img放入圖片 每次按隨機分組的按鈕 都會隨機換貓咪的照片
+            function changeImg() {
+                imgCat.src = "p7-cat" + Math.ceil(Math.random() * 6) + ".jpg";
+            };
+            changeImg();
+        }
+
+        // "清空"按鈕
+        function empty() {
+            let all = document.querySelector("#text");
+            let notClick1 = document.querySelector("#randomId")
+            if (confirm(("確定要清空?!...?!")) == true) {
+                all.value = "";
+                handleInputEventCopy();
+                TextAndAmount();
+            }
+        }
+
+        // 如果結果1和結果2的文字框為空 則不可按下"複製結果"按鈕
+        function handleInputEventCopy(event) { //  function handleInputEventCopy(event, checkTarget = null)  checkTarget參數的預設值為null 當呼叫handleInputEventCopy沒有給參數時 則checkTarget為null // checkTarget用來指定要被檢查的元素 而不會每個元素都檢查
+            // 如果結果1的文字框為空 則不可按下"複製結果"按鈕
+            let all = document.querySelector("#result");
+            let notClick3 = document.querySelector("#copy")
+            if (all.value == "") {
+                notClick3.classList.remove("btn");
+                notClick3.classList.add("notClickCss");
+            } else {
+                notClick3.classList.remove("notClickCss");
+                notClick3.classList.add("btn");
+            }
+            // 如果結果2的文字框為空 則不可按下"複製結果"按鈕
+            let allCopy2 = document.querySelector("#result2");
+            let notClickCopy2 = document.querySelector("#copy2")
+            if (allCopy2.value == "") {
+                notClickCopy2.classList.remove("btn");
+                notClickCopy2.classList.add("notClickCss");
+            } else {
+                notClickCopy2.classList.remove("notClickCss");
+                notClickCopy2.classList.add("btn");
+            }
+            // 如果輸入框為空 則不可按下"清空"按鈕 反之可按下"清空"按鈕
+            let allText = document.querySelector("#text");
+            let notClickText = document.querySelector("#emptyId")
+            if (allText.value == "") {
+                notClickText.classList.remove("btn");
+                notClickText.classList.add("notClickCss");
+            } else {
+                notClickText.classList.remove("notClickCss");
+                notClickText.classList.add("btn");
+            }
+        }
+        document.querySelector("#result").addEventListener("input", handleInputEventCopy);
+        document.querySelector("#result2").addEventListener("input", handleInputEventCopy);
+        document.querySelector("#text").addEventListener("input", handleInputEventCopy);
+
+        // 一組一段落呈現 "複製結果"按鈕
+        function clone() {
+            let btnCopy = document.querySelector("#result")
+            btnCopy.select();
+            document.execCommand('copy');
+            alert("複製成功");
+        }
+
+        // 一名字一行呈現 "複製結果"按鈕
+        function clone2() {
+            let btnCopy = document.querySelector("#result2")
+            btnCopy.select();
+            document.execCommand('copy');
+            alert("複製成功");
+        }
+
+    </script>
+
+</body>
+
+</html>
+<!-- function handleInputEventCopy(event) {
+    let allText = document.querySelector("#text");
+    let allCopy1 = document.querySelector("#result");
+    let allCopy2 = document.querySelector("#result2");
+    let notClickText = document.querySelector("#emptyId")
+    let notClickCopy1 = document.querySelector("#copy");
+    let notClickCopy2 = document.querySelector("#copy2");
+    if (allCopy1.value == "" || allCopy2.value == "" || allText.value == "") {
+        notClickText.classList.remove("btn");
+        notClickText.classList.add("notClickCss");
+        notClickCopy1.classList.remove("btn");
+        notClickCopy1.classList.add("notClickCss");
+        notClickCopy2.classList.remove("btn");
+        notClickCopy2.classList.add("notClickCss");
+    } else {
+        notClickText.classList.remove("notClickCss");
+        notClickText.classList.add("btn");
+        notClickCopy1.classList.remove("notClickCss");
+        notClickCopy1.classList.add("btn");
+        notClickCopy2.classList.remove("notClickCss");
+        notClickCopy2.classList.add("btn");
+    }
+}
+document.querySelector("#text").addEventListener("input", handleInputEventCopy);
+document.querySelector("#result").addEventListener("input", handleInputEventCopy);
+document.querySelector("#result2").addEventListener("input", handleInputEventCopy); -->
